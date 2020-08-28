@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+
 const Task = mongoose.model("Task", {
   description: {
     type: String,
@@ -9,3 +10,5 @@ const Task = mongoose.model("Task", {
     default: false,
   },
 });
+
+module.exports = Task;
