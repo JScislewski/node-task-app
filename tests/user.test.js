@@ -1,17 +1,10 @@
 const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/models/user");
+const { count } = require("../src/models/user");
+const { userOneId, userOne, setupDatabase } = require("./fixtures/db");
 
-const userOne = {
-  name: "Jan",
-  email: "jan@wp.pl",
-  password: "superhaslo123",
-};
-
-beforeEach(async () => {
-  await User.deleteMany();
-  await new User(userOne).save();
-});
+beforeEach(setupDatabase);
 
 afterEach(() => {
   console.log("afterEach");
@@ -35,11 +28,11 @@ test("Should throw weak password", async () => {
       email: "jan2@wp.pl",
       password: "haslo",
     })
-    .expect(received)
-    .toBe("XD");
+    .expect(400);
 });
 
 test("Should signup a new user", async () => {
+  const oldUsersCount = await User.countDocuments();
   await request(app)
     .post("/users")
     .send({
@@ -48,4 +41,6 @@ test("Should signup a new user", async () => {
       password: "MyPass777!",
     })
     .expect(201);
+  const newUsersCount = await User.countDocuments();
+  expect(newUsersCount).toBe(oldUsersCount + 1);
 });
